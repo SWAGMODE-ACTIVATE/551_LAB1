@@ -25,6 +25,10 @@ print('flask is starting')
 def index():
     return render_template("index.html")
 
+@app.route("/search")
+def searchpage():
+    return render_template("searchpage.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
