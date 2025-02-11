@@ -1,12 +1,13 @@
 from sqlalchemy import create_engine, text
 import os
+import csv
 
-# Load database URL
+#load database URL
 DATABASE_URL = "postgresql://postgres:poop@localhost/bookdb"
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
 
-# Connect to PostgreSQL
+#connect to PostgreSQL
 engine = create_engine(DATABASE_URL)
 conn = engine.connect()
 
@@ -41,21 +42,29 @@ fill_book_table = text("""
 
 """)
 
-# optional deletion and re-initializatoin
+#optional deletion and re-initializatoin of tables
 yesno = input("type 1 to delete all tables and re-initialize them ")
 if yesno == "1":
     print("deleting them")
-    with engine.begin() as conn:
+    with engine.begin() as conn: #calls the earlier functions, wil clear all users except nick
         conn.execute(delete_tables)
         conn.execute(create_book_talbe)
         conn.execute(create_user_talbe)
     print("tables remade.")
 
-#fill books from csv
-#with engine.begin() as conn:
-#    conn.execute(fill_book_table)
-
-
-#end
+file = open("books.csv", "r") #open books csv
+reader=csv.reader(file)
+next(reader)#skip header
+with engine.begin() as conn: #loops thru whole csv, registers all the books, skips if isbn already exists to avoid unique errors
+    for isbn, title, author, year in reader:
+        year = int(year)  #converts year to an integer
+        addbook = text("""
+                       INSERT INTO books (isbn, title, author, year)
+                       VALUES (:isbn, :title, :author, :year)
+                       ON CONFLICT (isbn) DO NOTHING;
+                       """)
+        conn.execute(addbook, {"isbn": isbn, "title": title, "author": author, "year": year})#calls addbook function will all things from csv
+    
+#ending stuff
 conn.close()
 print('done')

@@ -5,5 +5,12 @@ body {
 	h1 {
 		font-size: 72px;
 	}
+
+	input {
+		display: flex;
+		flex-direction: column;
+		text-align: center;
+		margin-left: 33%;
+	}
 }
 
