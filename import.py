@@ -35,21 +35,28 @@ CREATE TABLE IF NOT EXISTS books (
 """)
 
 delete_tables = text("""
-DROP TABLE IF EXISTS books, users;
+DROP TABLE IF EXISTS books, users, reviews;
 """)
 
-fill_book_table = text("""
+create_review_table = text("""
+CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    book_id INTEGER REFERENCES books(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    review TEXT NOT NULL
 
+);
 """)
 
 #optional deletion and re-initializatoin of tables
 yesno = input("type 1 to delete all tables and re-initialize them ")
 if yesno == "1":
     print("deleting them")
-    with engine.begin() as conn: #calls the earlier functions, wil clear all users except nick
+    with engine.begin() as conn: #calls the earlier functions, wil clear all users and reviews
         conn.execute(delete_tables)
         conn.execute(create_book_talbe)
         conn.execute(create_user_talbe)
+        conn.execute(create_review_table)
     print("tables remade.")
 
 file = open("books.csv", "r") #open books csv
