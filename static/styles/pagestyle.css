@@ -6,11 +6,22 @@ body {
 		font-size: 72px;
 	}
 
+	#logbutton {
+		font-size: 26px;
+		font-weight: bold;
+	}
+
 	input {
 		display: flex;
 		flex-direction: column;
 		text-align: center;
 		margin-left: 33%;
+	}
+
+	#searchbar input {
+		margin-left: auto;
+		margin-right: auto;
+		width: 50%;
 	}
 }
 

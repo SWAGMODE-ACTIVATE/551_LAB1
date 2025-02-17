@@ -1,9 +1,8 @@
 import os
 from flask import Flask, session, render_template, request
 from flask_session import Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
-from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
@@ -23,6 +22,9 @@ engine = create_engine(DATABASE_URL)
 db = scoped_session(sessionmaker(bind=engine))
 print('flask is starting')
 
+
+"""
+turns out this is ORM so not using it.
 class Book(db.Model):
     __tablename__="books"
     id = db.Column(db.Integer, primary_key=True)
@@ -44,11 +46,40 @@ class Review(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     review = db.Column(db.String, nullable=False)
 
-
+"""
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/login", methods =["POST"])
+def login():
+    username = request.form.get("usernamel")
+    password = request.form.get("passwordl")
+    existing_user = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), {"username": username, "password": password}).fetchone()
+    if existing_user:
+        return render_template("search.html", username=username)
+    else:
+        return render_template("index.html", message="username or password is incorrect.")
+    
+@app.route("/logout")
+def logout():
+    session.clear()
+    return render_template("index.html")
+
+
+@app.route("/register", methods=["POST"])
+def register():
+    username = request.form.get("usernamer")
+    password = request.form.get("passwordr")
+    existing_user = db.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchone()
+    if existing_user:
+        return render_template("index.html", message="username already exists.")
+    else:
+        db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), {"username": username, "password": password})
+        db.commit()
+        return render_template("index.html", message="account created, you can log in now.")
+
 
 @app.route("/search")
 def searchpage():
