@@ -42,7 +42,7 @@ create_review_table = text("""
 CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY,
     book_id INTEGER REFERENCES books(id) ON DELETE CASCADE,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    username TEXT NOT NULL,
     review TEXT NOT NULL
 
 );

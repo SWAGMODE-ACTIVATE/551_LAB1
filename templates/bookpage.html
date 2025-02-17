@@ -13,34 +13,31 @@
                 <h3>hello {{username}}</h3>
               </div>
               <div class="col">
+                <a class="logbutton" href="{{url_for('search')}}">search again</a>
+              </div>
+              <div class="col">
                 <a class="logbutton" href="{{url_for('logout')}}">log out</a>
               </div>
             </div>
         </div>
 
-        <h1>book search</h1>
+
+        <h1>{{book.title}}</h1>
+        <h3>by {{book.author}}, {{book.year}}</h3>
+        <p>isbn number - {{book.isbn}}</p>
         <p>&nbsp;</p>
-        <h3>search for a title, isbn, author, or publication date</h3>
-        <form id="searchbar" action = "/search" method="POST">
-            <input type="text" name="query" autocomplete="off" placeholder="search for something">
-            <button>search</button>
+        <form id="reviewbox" action = "{{ url_for('bookpage', book_id=book.id) }}" method="POST">
+          <input type="text" name="review" autocomplete="off" placeholder="write a review">
+          <button>submit</button>
         </form>
-
-        <p>&nbsp;</p>
-        <p>{{results}}</p>
-
+        <h3>reviews</h3>
         <ul>
-          {% for book in books %}
+          {% for review in reviews %}
             <li>
-              <a href="{{ url_for('bookpage', book_id=book.id) }}">
-                '{{book.title}}', {{book.author}} ({{book.year}}) - isbn {{book.isbn}}
-              </a>
+              <p>{{review.username}} says: {{review.review}}</p>
             </li>
           {% endfor %}
         </ul>
-
-
-
 
     </body>
 </html>

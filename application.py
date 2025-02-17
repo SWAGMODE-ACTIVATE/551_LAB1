@@ -58,7 +58,8 @@ def login():
     password = request.form.get("passwordl")
     existing_user = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), {"username": username, "password": password}).fetchone()
     if existing_user:
-        return render_template("search.html", username=username)
+        session["username"] = username
+        return render_template("search.html", username=session["username"])
     else:
         return render_template("index.html", message="username or password is incorrect.")
     
@@ -66,7 +67,6 @@ def login():
 def logout():
     session.clear()
     return render_template("index.html")
-
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -80,15 +80,33 @@ def register():
         db.commit()
         return render_template("index.html", message="account created, you can log in now.")
 
+@app.route("/search", methods=["POST", "GET"])
+def search():
+    if request.method == "POST":
+        search = request.form.get("query")
+        search = f"%{search}%"
+        result_exists = db.execute(text("SELECT * FROM books WHERE isbn LIKE :search OR title LIKE :search OR author LIKE :search OR CAST(year AS TEXT) LIKE :search"), {"search": search}).fetchall()
+        if result_exists:
+            return render_template("search.html", username=session["username"], results="results found", books=result_exists)
+        else:
+            return render_template("search.html", username=session["username"], results="no results found.")
+    if request.method == "GET":
+        return render_template("search.html", username=session["username"])
 
-@app.route("/search")
-def searchpage():
-    return render_template("searchpage.html")
-
-@app.route("/result")
-def result():
-    return render_template("result.html")
-
+@app.route("/book/<int:book_id>", methods=["POST","GET"])
+def bookpage(book_id):
+    if request.method == "GET":
+        book = db.execute(text("SELECT * FROM books WHERE id = :id"), {"id":book_id}).fetchone()
+        reviews = db.execute(text("SELECT * FROM reviews WHERE book_id = :id"), {"id":book_id}).fetchall()
+        return render_template("bookpage.html", book=book, username=session["username"], reviews=reviews)
+    if request.method == "POST":
+        review = request.form.get("review")
+        username = session["username"]
+        book = db.execute(text("SELECT * FROM books WHERE id = :id"), {"id":book_id}).fetchone()
+        db.execute(text("INSERT INTO reviews (book_id, username, review) VALUES (:book_id, :username, :review)"), {"book_id":book_id, "username":username, "review":review})
+        db.commit()
+        reviews = db.execute(text("SELECT * FROM reviews WHERE book_id = :id"), {"id":book_id}).fetchall()
+        return render_template("bookpage.html", book=book, username=session["username"], reviews=reviews)
 
 if __name__ == "__main__":
     app.run(debug=True)
