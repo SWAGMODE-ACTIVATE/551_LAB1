@@ -11,6 +11,7 @@
         <h1>book search</h1>
         <p>&nbsp;</p>
         <p>&nbsp;</p>
+        <h3>{{ message }}</h3>
         <p>&nbsp;</p>
 
         <div class="container">
@@ -20,9 +21,9 @@
 
                     <h2>log in</h2>
 
-                    <form>
-                        <input type="text" name="name" placeholder="username">
-                        <input type="text" name="name" placeholder="password">
+                    <form action = "/login" method="POST">
+                        <input type="text" name="usernamel" placeholder="username">
+                        <input type="password" name="passwordl" placeholder="password">
                         <button>login</button>
                     </form>
 
@@ -33,9 +34,9 @@
 
                     <h2>register</h2>
 
-                    <form>
-                        <input type="text" name="name" placeholder="username">
-                        <input type="text" name="name" placeholder="password">
+                    <form action ="/register" method="POST">
+                        <input type="text" name="usernamer" placeholder="username" required>
+                        <input type="text" name="passwordr" placeholder="password" required>
                         <button>register</button>
                     </form>
 
