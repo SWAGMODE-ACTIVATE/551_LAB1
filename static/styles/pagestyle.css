@@ -34,7 +34,12 @@ body {
 
 	ul {
 		list-style-type: none;
-		background-color: #659604;
+		padding: 0;
 	  }
+	
+	.review {
+		display: inline-block;
+		background-color: #6fa404;
+	}
 }
 
